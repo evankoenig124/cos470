@@ -12,23 +12,25 @@ soup_gf1 = BeautifulSoup(html_gf1.text, features='html.parser')
 soup_gf2 = BeautifulSoup(html_gf2.text, features='html.parser')
 
 def extract_lines(character, soup):
-    lines = []
-    for tag in soup.find_all("b"):
-        if tag.get_text().strip().lower() == character.lower():
-            next_sibling = tag.find_next_sibling()
-            while next_sibling and next_sibling.name != "b":
-                lines.append(next_sibling.get_text().strip())
-                next_sibling = next_sibling.find_next_sibling()
-    return lines
+    script = soup.find("pre")
+    script = script.get_text().splitlines()
+    newscript = ''
+    line = 0
+    while line < len(script):
+        if script[line].replace('\t', '') == character:
+            while True:
+                newscript += script[line] + '\n'
+                line += 1
+                if line >= len(script) or script[line] == '':
+                    break
+        line += 1
+    return newscript
 
 michael_lines_gf1 = extract_lines("MICHAEL", soup_gf1)
 michael_lines_gf2 = extract_lines("MICHAEL", soup_gf2)
 
-with open("Godfather1_Michael.txt", "w", encoding="utf-8") as file:
-    file.write("\n".join(michael_lines_gf1))
-
-with open("Godfather2_Michael.txt", "w", encoding="utf-8") as file:
-    file.write("\n".join(michael_lines_gf2))
+open("Godfather1.txt", "w", encoding="utf-8").write(michael_lines_gf1)
+open("Godfather2.txt", "w", encoding="utf-8").write(michael_lines_gf2)
 
 
 
