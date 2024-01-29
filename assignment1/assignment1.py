@@ -1,5 +1,7 @@
 import requests
 from bs4 import BeautifulSoup
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
 
 
 godFather_link = "https://www.dailyscript.com/scripts/The_Godfather.html"
@@ -32,5 +34,18 @@ michael_lines_gf2 = extract_lines("MICHAEL", soup_gf2)
 open("Godfather1.txt", "w", encoding="utf-8").write(michael_lines_gf1)
 open("Godfather2.txt", "w", encoding="utf-8").write(michael_lines_gf2)
 
+michael_lines_gf1 = michael_lines_gf1.replace('MICHAEL', '')
+michael_lines_gf2 = michael_lines_gf2.replace('MICHAEL', '')
 
+wordcloud1 = WordCloud(width=600, height=200,background_color='white').generate(michael_lines_gf1)
+plt.figure(figsize=(5, 3))
+plt.imshow(wordcloud1)
+plt.axis('off')
+plt.show()
+
+wordcloud2 = WordCloud(width=600, height=200,background_color='white').generate(michael_lines_gf2)
+plt.figure(figsize=(5, 3))
+plt.imshow(wordcloud2)
+plt.axis('off')
+plt.show()
 
