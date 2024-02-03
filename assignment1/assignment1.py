@@ -2,15 +2,16 @@ import requests
 from bs4 import BeautifulSoup
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+from transformers import AutoTokenizer
 
 def scrape_lines(character, soup):
-    script = soup.find("pre")
-    script = script.get_text().splitlines()
+    script = soup.find("pre") #FIND WHERE LINES ARE STORED
+    script = script.get_text().splitlines() #SPLITS INTO INDIVIDUAL LINES
     newscript = ''
     line = 0
-    while line < len(script):
-        if script[line].replace('\t', '') == character:
-            while True:
+    while line < len(script): #ITERATES ENTIRE SCRIPT 
+        if script[line].replace('\t', '') == character: #IF MICHAEL LINE
+            while True: #ITERATE UNTIL NO LONGER MICHAEL LINE
                 newscript += script[line] + '\n'
                 line += 1
                 if line >= len(script) or script[line] == '':
@@ -24,7 +25,7 @@ def wordcloud_plot(lines1, lines2):
     plt.imshow(wordcloud1)
     plt.axis('off')
     plt.show()
-
+    #PLOTS WORLDCLOUD OF MOST COMMON WORDS, CODE PROVIDED IN LECTURE SLIDES
     wordcloud2 = WordCloud(width=600, height=200,background_color='white').generate(lines2)
     plt.figure(figsize=(10, 6))
     plt.imshow(wordcloud2)
@@ -58,5 +59,10 @@ def main():
 
     wordcloud_plot(michael_lines_gf1,michael_lines_gf2)
     #WORLDCLOUD PLOT
+
+    text = "Because they know that no Sicilian will refuse a request on his daughter's wedding day."
+    tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
+    tokenized_text = tokenizer.tokenize(text)
+    print(tokenized_text)
 main()
 
