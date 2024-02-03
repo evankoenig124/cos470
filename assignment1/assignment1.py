@@ -4,6 +4,9 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from transformers import AutoTokenizer
 
+#assumptions: downloaded wordcloud plots through library
+#format of code is okay (no named tasks/classes)
+
 def scrape_lines(character, soup):
     script = soup.find("pre") #FIND WHERE LINES ARE STORED
     script = script.get_text().splitlines() #SPLITS INTO INDIVIDUAL LINES
@@ -20,13 +23,13 @@ def scrape_lines(character, soup):
     return newscript
 
 def wordcloud_plot(lines1, lines2):
-    wordcloud1 = WordCloud(width=600, height=200,background_color='white').generate(lines1)
+    wordcloud1 = WordCloud(width=2400, height=800,background_color='white').generate(lines1)
     plt.figure(figsize=(10, 6))
     plt.imshow(wordcloud1)
     plt.axis('off')
     plt.show()
     #PLOTS WORLDCLOUD OF MOST COMMON WORDS, CODE PROVIDED IN LECTURE SLIDES
-    wordcloud2 = WordCloud(width=600, height=200,background_color='white').generate(lines2)
+    wordcloud2 = WordCloud(width=2400, height=800,background_color='white').generate(lines2)
     plt.figure(figsize=(10, 6))
     plt.imshow(wordcloud2)
     plt.axis('off')
@@ -64,5 +67,6 @@ def main():
     tokenizer = AutoTokenizer.from_pretrained("bert-base-cased")
     tokenized_text = tokenizer.tokenize(text)
     print(tokenized_text)
+    #WORDPIECE TOKENIZATION
 main()
 
