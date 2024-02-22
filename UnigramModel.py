@@ -46,9 +46,11 @@ def calculate_probability(dic_term_prob, input_text):
 
 
 def main():
-    text = """You used to call me on my cell phone
-Late night when you need my love
-Call me on my cell phone"""
+    text = """A cold beer on a Friday night
+A pair of jeans that fit just right
+And the radio up
+Well I've done seen the sun rise
+See the love in my woman's eyes"""
     results = {}
 
     for genre in os.listdir("/Users/evankoenig/Downloads/TM_CA1_Lyrics2"):
@@ -56,7 +58,7 @@ Call me on my cell phone"""
         prob = freq_to_prob(dic)
         p = calculate_probability(prob, text)
         results[genre] = p
-    sorted_dict = dict(sorted(results.items(), key=lambda item: item[1], reverse=True))
+    sorted_dict = dict(sorted(results.items(), key=lambda item: item[1], reverse=False))
     for key in sorted_dict:
         print(f"{key}: {sorted_dict[key]}")
     return
