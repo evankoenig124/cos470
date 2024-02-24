@@ -45,22 +45,17 @@ def calculate_probability(dic_term_prob, input_text):
     return prob
 
 
-def main():
-    text = """A cold beer on a Friday night
-A pair of jeans that fit just right
-And the radio up
-Well I've done seen the sun rise
-See the love in my woman's eyes"""
-    results = {}
+def unigramrun(text):
 
-    for genre in os.listdir("/Users/evankoenig/Downloads/TM_CA1_Lyrics2"):
-        dic = read_files_in_directory(f"/Users/evankoenig/Downloads/TM_CA1_Lyrics2/{genre}/")
+    results = {}
+    path = "/Users/evankoenig/Downloads/TM_CA1_Lyrics2"
+
+    for genre in os.listdir(path):
+        dic = read_files_in_directory(f"{path}/{genre}/")
         prob = freq_to_prob(dic)
         p = calculate_probability(prob, text)
         results[genre] = p
-    sorted_dict = dict(sorted(results.items(), key=lambda item: item[1], reverse=False))
-    for key in sorted_dict:
-        print(f"{key}: {sorted_dict[key]}")
-    return
-
-main()
+    #sorted_dict = dict(sorted(results.items(), key=lambda item: item[1], reverse=False))
+    #for key in sorted_dict:
+        #print(f"{key}: {sorted_dict[key]}")
+    return results
