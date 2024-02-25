@@ -59,3 +59,7 @@ def unigramrun(text):
     #for key in sorted_dict:
         #print(f"{key}: {sorted_dict[key]}")
     return results
+
+#print(unigramrun("""You used to call me on my cell phone
+#Late night when you need my love
+#Call me on my cell phone"""))

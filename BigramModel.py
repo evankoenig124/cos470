@@ -8,23 +8,27 @@ from collections import defaultdict
 
 
 def read_files_in_directory(directory_path):
-    # key: tokens value: their frequency in all songs belonging to a genre
+    # Precompile regular expression pattern
+    regex_pattern = re.compile("[^A-Za-z\s]")
+
+    # Initialize dictionaries
     dic_term_frequency = defaultdict(int)
     dic_pairs_frequency = defaultdict(int)
+
     for file in os.listdir(directory_path):
-        with open(directory_path + file, 'r') as rfile:
+        with open(os.path.join(directory_path, file), 'r') as rfile:
             for line in rfile:
-                current_line = line.strip()
+                current_line = regex_pattern.sub("", line.strip().lower())
                 tokens = word_tokenize(current_line)
-                for i in range(len(tokens)):
-                    tokens[i] =re.sub("[^A-Za-z]","",tokens[i])
-                if tokens != []:
-                    dic_pairs_frequency[f"<s> {tokens[0].lower()}"] += 1
-                    for i in range(len(tokens)-1):
-                        dic_term_frequency[tokens[i].lower()] += 1
-                        dic_pairs_frequency[f"{tokens[i].lower()} {tokens[i+1].lower()}"] += 1
-                    dic_pairs_frequency[f"{tokens[-1].lower()} </s>"] += 1
                 
+                if tokens:
+                    # Update frequency dictionaries
+                    dic_pairs_frequency[f"<s> {tokens[0]}"] += 1
+                    for i in range(len(tokens)-1):
+                        dic_term_frequency[tokens[i]] += 1
+                        dic_pairs_frequency[f"{tokens[i]} {tokens[i+1]}"] += 1
+                    dic_pairs_frequency[f"{tokens[-1]} </s>"] += 1
+
 
     return dic_term_frequency, dic_pairs_frequency
 
@@ -50,6 +54,7 @@ def calculate_probability(dic_term_prob, input_text):
         if dic_term_prob.get(term, 0) > 0:
             prob += math.log(dic_term_prob.get(term))
 
+
     return prob
 
 
@@ -66,3 +71,7 @@ def bigramrun(text):
     #for key in sorted_dict:
         #print(f"{key}: {sorted_dict[key]}")
     return results
+
+#print(bigramrun("""You used to call me on my cell phone
+#Late night when you need my love
+#Call me on my cell phone"""))
