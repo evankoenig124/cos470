@@ -1,48 +1,43 @@
-from BigramModel import bigramrun
-from UnigramModel import unigramrun
+from BigramModel import bigramrun, bigramtraining
+from UnigramModel import unigramrun, unigramtraining
 import os
 import csv
+
+UNIDIC = unigramtraining()
+BIDIC1, BIDIC2 = bigramtraining()
 
 def find_best_lambda(directory_path):
     highest_correct_predictions = 0
     best_lambda_value = 0
-    best_lambda_results = {}
         
     for i in range(11):
         lambda_value = i / 10.0
         current_correct_predictions = 0
         
-        for file in os.listdir(directory_path):  # For each song in the validation set
-
+        for file in os.listdir(directory_path):
             if file.endswith('.txt'):
-                print("newfile")
                 with open(os.path.join(directory_path, file), 'r') as file:
                     actual_genre = file.readline()
                     actual_genre = actual_genre.strip()
-
-                    text = file.read()  # Read the rest of the text
-                    unigram_results = unigramrun(text)
-                    print("uni")
-                    bigram_results = bigramrun(text)
-                    print("bi")
+                    text = file.read()
+                    unigram_results = unigramrun(text, UNIDIC)
+                    bigram_results = bigramrun(text, BIDIC1, BIDIC2)
 
                     combined_results = {}
                     for genre in unigram_results:
                         combined_probability = (lambda_value * unigram_results[genre]) + ((1 - lambda_value) * bigram_results[genre])
                         combined_results[genre] = combined_probability
                     
-                    print(combined_results)
                     if min(combined_results, key=combined_results.get) == actual_genre:
                         current_correct_predictions += 1
 
-            # Check if there are more correct predictions than before
-        if highest_correct_predictions < current_correct_predictions:
+        if highest_correct_predictions <= current_correct_predictions:
             highest_correct_predictions = current_correct_predictions
             best_lambda_value = lambda_value
                 
     return best_lambda_value
 
-def calculate_mixed(path, lambda_value):
+def goldlabelresults(path, lambda_value):
     unigram_results = {}
     bigram_results = {}
     mixed_results = {}
@@ -51,8 +46,8 @@ def calculate_mixed(path, lambda_value):
     with open(path, 'r', newline='') as tsvfile:
         reader = csv.reader(tsvfile, delimiter='\t')
         for song in reader:
-            unigram_line = unigramrun(song[1])
-            bigram_line = bigramrun(song[1])
+            unigram_line = unigramrun(song[1], UNIDIC)
+            bigram_line = bigramrun(song[1], BIDIC1, BIDIC2)
             mixed_line = {}
             for genre in unigram_line:
                 combined_probability = (lambda_value * unigram_line[genre]) + ((1 - lambda_value) * bigram_line[genre])
@@ -126,12 +121,10 @@ def sigtest(unif1, bif1, mixf1):
 def mixedrun():
     lambdapath = "/Users/evankoenig/Desktop/Validation_Set"
     f1path = "/Users/evankoenig/Downloads/test.tsv"
-    #best_lambda = find_best_lambda(lambdapath)
-    best_lambda = 0.4
-    unigram_results, bigram_results, mixed_results = calculate_mixed(f1path, best_lambda)
+    best_lambda = find_best_lambda(lambdapath)
+    print("Best lambda value:", best_lambda)
+    unigram_results, bigram_results, mixed_results = goldlabelresults(f1path, best_lambda)
     unif1, bif1, mixf1 = calculate_f1(unigram_results, bigram_results, mixed_results, f1path)
     sigtest(unif1, bif1, mixf1)
 
 mixedrun()
-
-#try f1 score first, .4 is best lambda, 

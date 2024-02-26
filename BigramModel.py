@@ -1,66 +1,76 @@
 import os
 from nltk.tokenize import word_tokenize
 import math
-from collections import defaultdict
-
+import re
 
 def read_files_in_directory(directory_path):
-    # Initialize dictionaries
-    dic_term_frequency = defaultdict(int)
-    dic_pairs_frequency = defaultdict(int)
+    # key: tokens value: their frequency in all songs belonging to a genre
+    dic_genre_term_frequency = {}
+    dic_genre_pairs_frequency = {}
+    for genre in os.listdir(directory_path):
+        dic_term_frequency = {}
+        dic_pairs_frequency = {}
+        for song in os.listdir(f"{directory_path}/{genre}/"):
+            with open(f"{directory_path}/{genre}/{song}", 'r') as rfile:
+                for line in rfile:
+                    line = line.lower()
+                    line = re.sub(r'[^a-zA-Z ]', '', line)
+                    tokens = word_tokenize(line)
+                    if tokens != []:
+                        dic_pairs_frequency[f"<s> {tokens[0]}"] = dic_pairs_frequency.get(f"<s> {tokens[0]}", 0) + 1
+                        for i in range(len(tokens)-1):
+                            dic_term_frequency[tokens[i]] = dic_term_frequency.get(tokens[i], 0) + 1
+                            dic_pairs_frequency[f"{tokens[i]} {tokens[i+1]}"] = dic_pairs_frequency.get(f"{tokens[i]} {tokens[i+1]}", 0) + 1
+                        dic_pairs_frequency[f"{tokens[-1]} </s>"] = dic_pairs_frequency.get(f"{tokens[-1]} </s>", 0) + 1
+        dic_genre_term_frequency[genre] = dic_term_frequency
+        dic_genre_pairs_frequency[genre] = dic_pairs_frequency
 
-    for file in os.listdir(directory_path):
-        with open(os.path.join(directory_path, file), 'r') as rfile:
-            text = rfile.read().lower()
-            tokens = word_tokenize(text)
-            if tokens:
-                # Update frequency dictionaries
-                dic_pairs_frequency[f"<s> {tokens[0]}"] += 1
-                for i in range(len(tokens)-1):
-                    dic_term_frequency[tokens[i]] += 1
-                    dic_pairs_frequency[tokens[i] + " " + tokens[i+1]] += 1
-                dic_pairs_frequency[f"{tokens[-1]} </s>"] += 1
 
-    return dic_term_frequency, dic_pairs_frequency
+    return dic_genre_term_frequency, dic_genre_pairs_frequency
 
 
 def freq_to_prob(dic_term_frequency, dic_pairs_frequency):
     dic_term_prob = {}
-    for term in dic_pairs_frequency:
-        bottomterm = word_tokenize(term)
-        bottomterm = term[0]
-        if dic_term_frequency[bottomterm]:
-            dic_term_prob[term] = (((dic_pairs_frequency[term] * 1.0) + 1)/(dic_term_frequency[bottomterm]+ len(dic_pairs_frequency)))
+    for genre, terms in dic_pairs_frequency.items():
+        # Check if the genre key exists in dic_term_prob, if not, initialize an empty dictionary
+        if genre not in dic_term_prob:
+            dic_term_prob[genre] = {}
+        
+        for token in terms:
+            bottomterm = token.split()
+            bottomterm = bottomterm[0]
+            if bottomterm in dic_term_frequency[genre].keys():
+                term_frequency = (((dic_pairs_frequency[genre][token] * 1.0) + 1)/(dic_term_frequency[genre][bottomterm]+ len(dic_pairs_frequency)))
+                dic_term_prob[genre][token] = term_frequency
 
     return dic_term_prob
 
 
-def calculate_probability(dic_term_prob, input_text):
+def calculate_probability(dic_term_prob, input_text, genre):
     prob = 0.0
+    input_text = input_text.lower()
     input_text = word_tokenize(input_text)
     for i in range(len(input_text)-1):
-        input_text[i] = input_text[i].lower() + " " + input_text[i+1].lower()
+        input_text[i] = input_text[i] + " " + input_text[i+1]
     for term in input_text:
-        if dic_term_prob.get(term, 0) > 0:
-            prob += math.log(dic_term_prob.get(term))
+        if dic_term_prob[genre].get(term, 0) > 0:
+            prob += math.log(dic_term_prob[genre].get(term))
 
     return prob
 
+def bigramtraining():
+    path = "/Users/evankoenig/Downloads/TM_CA1_Lyrics2"
+    for genre in os.listdir(path):
+        dic1, dic2 = read_files_in_directory(f"{path}/")
+    
+    return dic1, dic2
 
-def bigramrun(text):
+def bigramrun(text, dic1, dic2):
     results = {}
     path = "/Users/evankoenig/Downloads/TM_CA1_Lyrics2"
 
     for genre in os.listdir(path):
-        dic1, dic2 = read_files_in_directory(f"{path}/{genre}/")
         prob = freq_to_prob(dic1, dic2)
-        p = calculate_probability(prob, text)
+        p = calculate_probability(prob, text, genre)
         results[genre] = p
-    #sorted_dict = dict(sorted(results.items(), key=lambda item: item[1], reverse=False))
-    #for key in sorted_dict:
-        #print(f"{key}: {sorted_dict[key]}")
     return results
-
-print(bigramrun("""You used to call me on my cell phone
-Late night when you need my love
-Call me on my cell phone"""))
