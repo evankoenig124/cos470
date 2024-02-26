@@ -1,8 +1,6 @@
 import os
-import nltk
 from nltk.tokenize import word_tokenize
 import math
-nltk.download('punkt')
 from collections import defaultdict
 
 
@@ -12,13 +10,12 @@ def read_files_in_directory(directory_path):
 
     for file in os.listdir(directory_path):
         with open(directory_path + file, 'r') as rfile:
-            for line in rfile:
-                current_line = line.strip()
-                tokens = word_tokenize(current_line)
-                for token in tokens:
-                    dic_term_frequency[token.lower()] += 1
-                # process the tokens and update your dictionary
-                # YOUR CODE
+            text = rfile.read().lower()
+            tokens = word_tokenize(text)
+            for token in tokens:
+                dic_term_frequency[token] += 1
+            # process the tokens and update your dictionary
+            # YOUR CODE
 
     return dic_term_frequency
 
@@ -60,6 +57,6 @@ def unigramrun(text):
         #print(f"{key}: {sorted_dict[key]}")
     return results
 
-#print(unigramrun("""You used to call me on my cell phone
-#Late night when you need my love
-#Call me on my cell phone"""))
+print(unigramrun("""You used to call me on my cell phone
+Late night when you need my love
+Call me on my cell phone"""))

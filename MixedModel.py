@@ -110,10 +110,18 @@ def calculate_f1(unigram, bigram, mixed, path):
                     else:
                         mixfp += 1  
 
-    print("Unigram:", (2*(unitp/(unitp+unifp))*(unitp/(unitp+unifn))) / (unitp/(unitp+unifp) + unitp/(unitp+unifn)))
-    print("Bigram:", (2*(bitp/(bitp+bifp))*(bitp/(bitp+bifn))) / (bitp/(bitp+bifp) + bitp/(bitp+bifn)))
-    print("Mixed:", (2*(mixtp/(mixtp+mixfp))*(mixtp/(mixtp+mixfn))) / (mixtp/(mixtp+mixfp) + mixtp/(mixtp+mixfn)))
+    unif1 = (2*(unitp/(unitp+unifp))*(unitp/(unitp+unifn))) / (unitp/(unitp+unifp) + unitp/(unitp+unifn))
+    bif1 = (2*(bitp/(bitp+bifp))*(bitp/(bitp+bifn))) / (bitp/(bitp+bifp) + bitp/(bitp+bifn))
+    mixf1 = (2*(mixtp/(mixtp+mixfp))*(mixtp/(mixtp+mixfn))) / (mixtp/(mixtp+mixfp) + mixtp/(mixtp+mixfn))
 
+    print("Unigram:", unif1)
+    print("Bigram:", bif1)
+    print("Mixed:", mixf1)
+
+    return unif1, bif1, mixf1
+
+def sigtest(unif1, bif1, mixf1):
+    print("done")
 
 def mixedrun():
     lambdapath = "/Users/evankoenig/Desktop/Validation_Set"
@@ -121,7 +129,8 @@ def mixedrun():
     #best_lambda = find_best_lambda(lambdapath)
     best_lambda = 0.4
     unigram_results, bigram_results, mixed_results = calculate_mixed(f1path, best_lambda)
-    calculate_f1(unigram_results, bigram_results, mixed_results, f1path)
+    unif1, bif1, mixf1 = calculate_f1(unigram_results, bigram_results, mixed_results, f1path)
+    sigtest(unif1, bif1, mixf1)
 
 mixedrun()
 
