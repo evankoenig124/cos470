@@ -3,7 +3,6 @@ from UnigramModel import unigramrun, unigramtraining
 import os
 import csv
 import scipy.stats as stats
-
 #import necessary libraries
 
 UNIDIC = unigramtraining()

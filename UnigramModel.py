@@ -5,7 +5,7 @@ import re
 #Import necessary libraries
 
 
-def read_files_in_directory(directory_path): #read song and store it in a dictionary
+def read_files_in_directory(directory_path): #read all songs and store it in a dictionary
     dic_genre_term_frequency = {}
 
     for genre in os.listdir(directory_path):

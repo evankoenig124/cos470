@@ -73,3 +73,7 @@ def bigramrun(text, dic1, dic2):
         p = calculate_probability(prob, text, genre)
         results[genre] = p
     return results
+
+#To run individually
+#dic1, dic2 = bigramtraining()
+#print(bigramrun(text, dic))
